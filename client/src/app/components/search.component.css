@@ -1,0 +1,88 @@
+/* Container for the switch */
+.switch1, .switch2 {
+    position: relative;
+    display: inline-block;
+    width: 70px; /* Width of the slider */
+    height: 40px; /* Height of the slider */
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Hide the radio button by default */
+.switch1 input, .switch2 input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider itself */
+.switch1 .slider, .switch2 .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.switch1 .slider {
+    border-top-left-radius: 34px; /* Round the corners */
+    border-bottom-left-radius: 34px; /* Round the corners */
+}
+
+/* The slider itself */
+.switch2 .slider {
+    border-top-right-radius: 34px; /* Round the corners */
+    border-bottom-right-radius: 34px; /* Round the corners */
+}
+
+.switch1 .slider:hover, .switch2 .slider:hover {
+    color: bisque;
+    background-color: #727272;
+}
+
+/* When the radio button is checked (toggled) */
+.switch1 input:checked + .slider {
+    background-color: #dfcf4f; /* Green background for "checked" */
+}
+
+/* When the radio button is checked (toggled) */
+.switch2 input:checked + .slider {
+    background-color: #6267bc; /* Green background for "checked" */
+}
+
+button {
+    position: relative;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 10px 10px;
+    display: flex;
+    border: 1px #6267bc solid;
+    outline: none;
+    background-color: #6267bc;
+}
+
+button:hover {
+    background-color: #4b4e8f;
+    color: bisque;
+}
+
+button:active {
+    background-color: #2e3058; /* Change to selected color */
+    color: bisque; /* Change text color */
+}
+
+#city {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px #6267bc solid;
+}
+
+td {
+    padding: 0 5px;
+}

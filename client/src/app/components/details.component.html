@@ -1,0 +1,34 @@
+<h1>Weather Details for: {{ details.city }} ({{ details.units }} units)</h1>
+<hr>
+<table>
+    <thead>
+        <tr>
+            <th>Weather</th>
+            <th>Description</th>
+            <th>Temperature</th>
+            <th>Pressure</th>
+            <th>Humidity</th>
+            <th>Visibility</th>
+            <th>Windspeed</th>
+            <th>Sunrise</th>
+            <th>Sunset</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ details.weather }}</td>
+            <td>{{ details.description }}</td>
+            <td>
+                {{ details.temperature }} | {{ details.feelsLike }}
+                <span *ngIf="details.units === 'imperial'">°F</span>
+                <span *ngIf="details.units === 'metric'">°C</span>
+            </td>
+            <td>{{ details.pressure }}</td>
+            <td>{{ details.humidity }}</td>
+            <td>{{ details.visibility }}</td>
+            <td>{{ details.windspeed }}</td>
+            <td>{{ details.sunrise }}</td>
+            <td>{{ details.sunset }}</td>
+        </tr>
+    </tbody>
+</table>

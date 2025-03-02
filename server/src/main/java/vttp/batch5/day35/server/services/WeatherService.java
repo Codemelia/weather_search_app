@@ -1,6 +1,10 @@
 package vttp.batch5.day35.server.services;
 
 import java.io.StringReader;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +73,15 @@ public class WeatherService {
 
         // sunrise/sunset
         JsonObject sysJson = respJson.getJsonObject("sys");
-        Long sunrise = sysJson.getJsonNumber("sunrise").longValue();
-        Long sunset = sysJson.getJsonNumber("sunset").longValue();
+        Long sunriseLong = sysJson.getJsonNumber("sunrise").longValue();
+        Long sunsetLong = sysJson.getJsonNumber("sunset").longValue();
+        Integer timezone = respJson.getInt("timezone"); // timezone
+
+        ZonedDateTime sunrise = Instant.ofEpochSecond(sunriseLong).atZone(ZoneOffset.ofTotalSeconds(timezone));
+        ZonedDateTime sunset = Instant.ofEpochSecond(sunsetLong).atZone(ZoneOffset.ofTotalSeconds(timezone));
+
+        // dtf
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("hh:mm:ss a");
 
         // gen a UUID for display purpose
         String id = UUID.randomUUID().toString().substring(0, 4);
@@ -78,10 +89,10 @@ public class WeatherService {
         // build new json with desired fields
         JsonObject resultJson = Json.createObjectBuilder()
             .add("id", id)
-            .add("city", city != null ? city : "")
-            .add("units", units != null ? units : "")
-            .add("weather", weather != null ? weather : "")
-            .add("description", description != null ? description : "")
+            .add("city", city != null ? city : "Not Available")
+            .add("units", units)
+            .add("weather", weather != null ? weather : "Not Available")
+            .add("description", description != null ? description : "Not Available")
             .add("icon", icon != null ? icon : "")
             .add("temperature", temperature != null ? temperature : 0.0)
             .add("feelsLike", feelsLike != null ? feelsLike : 0.0)
@@ -89,8 +100,8 @@ public class WeatherService {
             .add("humidity", humidity != null ? humidity : 0)
             .add("visibility", visibility != null ? visibility : 0)
             .add("windspeed", windspeed != null ? windspeed : 0.0)
-            .add("sunrise", sunrise != null ? sunrise : 0)
-            .add("sunset", sunset != null ? sunset : 0)
+            .add("sunrise", sunrise != null ? dtf.format(sunrise) : "Not Available")
+            .add("sunset", sunset != null ? dtf.format(sunset) : "Not Available")
             .build();
 
         // return json obj

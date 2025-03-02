@@ -1,48 +1,63 @@
-<h1>Weather Search Application</h1>
-<hr>
-<form [formGroup]="form" (submit)="search()">
-  <table>
-    <tr>
-      <td> <h2>Search City:</h2> </td>
-      <td> <input id="city" type="text" size="50" formControlName="city"> </td>
-      <td>
-        <label class="switch1">
-          <input type="radio" name="units" value="metric" formControlName="units">
-          <span class="slider">Metric</span> 
-        </label>
-      
-        <label class="switch2">
-          <input type="radio" name="units" value="imperial" formControlName="units">
-          <span class="slider">Imperial</span> 
-        </label>
-      </td>
-      <td> <button type="submit" [disabled]="form.invalid">Search</button> </td>
-    </tr>
-  </table>
-</form>
-<hr>
-<h2>Weather Search Results</h2>
-
-@if (results != null && results.length > 0) {
-  <table class="results">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>City</th>
-        <th>Details</th>
-
-      </tr>
-    </thead>
-    <tbody>
-      @for (r of results; track $index) {
+<div class="view-container">
+  <div class="search-container">
+    <h1>Weather Search Application</h1>
+    <hr>
+    <form [formGroup]="form" (submit)="search()">
+      <table>
         <tr>
-          <td>{{ r.id }}</td>
-          <td>{{ r.city }}</td>
+          <td> <h2>Search City:</h2> </td>
+          <td> <input id="city" type="text" size="50" [(ngModel)]="searchTerms.city" formControlName="city"> </td>
           <td>
-            <button type="button" (click)="viewDetails(r.city + '+' + r.units)">View</button>
+            <label class="switch1">
+              <input type="radio" name="units" value="Metric" [(ngModel)]="searchTerms.units" formControlName="units">
+              <span class="slider">Metric</span> 
+            </label>
+          
+            <label class="switch2">
+              <input type="radio" name="units" value="Imperial" formControlName="units">
+              <span class="slider">Imperial</span> 
+            </label>
           </td>
+          <td> <button type="submit" [disabled]="form.invalid">Search</button> </td>
         </tr>
-      }
-    </tbody>
-  </table>
-}
+      </table>
+    </form>
+    <hr>
+  </div>
+  
+  <div class="results-header">
+    <h2>Search Results</h2>
+    <button type="button" id="clear-btn" (click)="destroy()">Clear Results</button>
+  </div>
+  
+  <div class="table-container">
+    @if (results != null && results.length > 0) {
+      <table class="results">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>CITY</th>
+            <th>UNITS</th>
+            <th>DETAILS</th>
+    
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of results; track $index) {
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.city }}</td>
+              <td>{{ r.units }}</td>
+              <td class="btn-column">
+                <button type="button" (click)="viewDetails(r.city + '+' + r.units)">View</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else { 
+      <h3>No Results Available</h3>
+    }
+  </div>
+  <hr>
+</div>

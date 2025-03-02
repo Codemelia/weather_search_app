@@ -1,7 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../services/api.service';
-import { SearchResult } from '../models';
+import { SearchResult } from '../models/models';
+import { HttpClient } from '@angular/common/http';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-details',
@@ -10,6 +12,8 @@ import { SearchResult } from '../models';
   styleUrl: './details.component.css'
 })
 export class DetailsComponent implements OnInit {
+
+  private title = inject(Title)
 
   // get activated route
   private route = inject(ActivatedRoute)
@@ -22,6 +26,7 @@ export class DetailsComponent implements OnInit {
 
   // on init, get details via id and display
   ngOnInit(): void {
+    this.title.setTitle('Weather Details')
     this.cityUnits = this.route.snapshot.paramMap.get('cityUnits')! // get cityUnits from param
     console.info('>>> RETRIEVING DATA FOR: ', this.cityUnits)
     this.apiSvc.retrieveData(this.cityUnits)

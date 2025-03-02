@@ -16,6 +16,6 @@ export interface SearchResult {
   humidity: number
   visibility: number
   windspeed: number
-  sunrise: number
-  sunset: number
+  sunrise: string
+  sunset: string
 }

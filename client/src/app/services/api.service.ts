@@ -1,5 +1,5 @@
 import { inject, Injectable } from "@angular/core";
-import { SearchResult } from "../models";
+import { SearchResult } from "../models/models";
 import { firstValueFrom } from "rxjs";
 import { HttpClient, HttpParams } from "@angular/common/http";
 

@@ -1,7 +1,8 @@
 import { inject, Injectable } from "@angular/core";
 import { SearchResult } from "../models/models";
-import { firstValueFrom } from "rxjs";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { firstValueFrom, Observable, Subscription } from "rxjs";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { dateTimestampProvider } from "rxjs/internal/scheduler/dateTimestampProvider";
 
 @Injectable( { providedIn: "root" } )
 export class ApiService {
@@ -11,7 +12,13 @@ export class ApiService {
 
   // to store results
   private result!: SearchResult;
+  protected response: string = ''
 
+  private sub!: Subscription
+
+  // REDIS FUNCTIONS
+
+  // search weather and save to redis if not saved yet
   searchWeather(city: string, units: string): Promise<SearchResult> {
 
     // set params
@@ -28,8 +35,8 @@ export class ApiService {
 
   }
 
-  // retrieve details via id
-  retrieveData(cityUnits: string) {
+  // retrieve details via id from redis
+  retrieveData(cityUnits: string): Promise<SearchResult> {
 
     // set params
     const params = new HttpParams()
@@ -42,6 +49,46 @@ export class ApiService {
       this.http.get<SearchResult>('/api/city', { params })
     )
 
+  }
+
+  // check redis db size
+  checkRedisSize(): Observable<number> {
+    return this.http.get<number>('/api/checkRedis')
+  }
+
+  // retrieve all data from redis
+  retrieveRedis(): Observable<SearchResult[]> {
+    return this.http.get<SearchResult[]>('/api/retrieveRedis')
+  }
+
+  // clear all data  from redis
+  clearRedis(): void {
+    this.sub = this.http.get<void>('/api/clearRedis').subscribe({
+      next: () => console.log('Redis cleared successfully'),
+      error: (err) => console.error('Failed to clear Redis', err),
+      complete: () => this.sub.unsubscribe()
+    });
+  }
+
+  // MONGO FUNCTIONS
+
+  // save list of weather data to mongodb
+  // send with headers
+  // returns last id for checking
+  async saveDB(list: SearchResult[]): Promise<string> {
+
+    // set custom headers
+    const headers = new HttpHeaders()
+      .set('timestamp', dateTimestampProvider.now().toString()) // send timestamp as string
+      .set('Content-Type', 'application/json')
+
+      this.response = await firstValueFrom(this.http.post<string>('/api/save', list))
+      return this.response
+
+  }
+
+  viewMongo(): Observable<SearchResult[]> {
+    return this.http.get<SearchResult[]>('/api/viewMongo')
   }
 
 }

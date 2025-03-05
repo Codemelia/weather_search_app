@@ -1,47 +1,51 @@
 <div class="view-container">
     <h1>Weather Details for: {{ details.city }} (Unit: {{ details.units }})</h1>
     <hr>
-    <div class="img-container">
-        <img [src]="'http://openweathermap.org/img/wn/' + details.icon + '@4x.png'" alt="Weather Icon">
-    </div>
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Weather</th>
-                    <th>Description</th>
-                    <th>Temperature</th>
-                    <th>Pressure</th>
-                    <th>Humidity</th>
-                    <th>Visibility</th>
-                    <th>Windspeed</th>
-                    <th>Sunrise (Local)</th>
-                    <th>Sunset (Local)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ details.weather }}</td>
-                    <td>{{ details.description }}</td>
-                    <td>
-                        {{ details.temperature }} | {{ details.feelsLike }}
-                        <span *ngIf="details.units === 'Imperial' || details.units === 'Standard'">°F</span>
-                        <span *ngIf="details.units === 'Metric'">°C</span>
-                    </td>
-                    <td>{{ details.pressure }} hPa</td>
-                    <td>{{ details.humidity }} % </td>
-                    <td>{{ details.visibility }} m</td>
-                    <td>
-                        {{ details.windspeed }}
-                        <span *ngIf="details.units === 'Metric' || details.units === 'Standard'">m/s</span>
-                        <span *ngIf="details.units === 'Imperial'">mph</span>
-                    </td>
-                    <td>{{ details.sunrise }}</td>
-                    <td>{{ details.sunset }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    
+        @if (details.city != undefined) {
+            <div class="table-container">
+                <div class="img-container">
+                    <img [src]="'http://openweathermap.org/img/wn/' + details.icon + '@4x.png'" alt="Weather Icon">
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Weather</th>
+                            <th>Description</th>
+                            <th>Temperature</th>
+                            <th>Pressure</th>
+                            <th>Humidity</th>
+                            <th>Visibility</th>
+                            <th>Windspeed</th>
+                            <th>Sunrise (Local)</th>
+                            <th>Sunset (Local)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ details.weather }}</td>
+                            <td>{{ details.description }}</td>
+                            <td>
+                                {{ details.temperature }} | {{ details.feelsLike }}
+                                <span *ngIf="details.units === 'Imperial' || details.units === 'Standard'">°F</span>
+                                <span *ngIf="details.units === 'Metric'">°C</span>
+                            </td>
+                            <td>{{ details.pressure }} hPa</td>
+                            <td>{{ details.humidity }} % </td>
+                            <td>{{ details.visibility }} m</td>
+                            <td>
+                                {{ details.windspeed }}
+                                <span *ngIf="details.units === 'Metric' || details.units === 'Standard'">m/s</span>
+                                <span *ngIf="details.units === 'Imperial'">mph</span>
+                            </td>
+                            <td>{{ details.sunrise }}</td>
+                            <td>{{ details.sunset }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        } 
+        
     <hr>
     <div class="back-btn">
         <button type="button" [routerLink]="['/']">Back</button>

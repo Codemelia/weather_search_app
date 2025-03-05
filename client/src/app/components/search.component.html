@@ -26,8 +26,9 @@
   </div>
   
   <div class="results-header">
+    <button type="button" id="review-btn" (click)="review()">Review</button>
     <h2>Search Results</h2>
-    <button type="button" id="clear-btn" (click)="destroy()">Clear Results</button>
+    <button type="button" id="clear-btn" (click)="destroy()">Clear</button>
   </div>
   
   <div class="table-container">
@@ -60,4 +61,7 @@
     }
   </div>
   <hr>
+  <div class="footer">
+    <button type="button" id="db-btn" (click)="viewDB()">Saved Results</button>
+  </div>
 </div>

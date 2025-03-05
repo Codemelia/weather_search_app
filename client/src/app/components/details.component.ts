@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../services/api.service';
 import { SearchResult } from '../models/models';
 import { HttpClient } from '@angular/common/http';
@@ -17,6 +17,7 @@ export class DetailsComponent implements OnInit {
 
   // get activated route
   private route = inject(ActivatedRoute)
+  private router = inject(Router)
 
   // inject services
   private apiSvc = inject(ApiService)
@@ -36,6 +37,7 @@ export class DetailsComponent implements OnInit {
       })
       .catch(err => {
         console.error('>>> ERROR FETCHING WEATHER DATA: ', err)
+        this.router.navigate(['/']) // go back to landing page if there is error
       })
   }
 

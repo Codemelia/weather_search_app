@@ -1,0 +1,40 @@
+<div class="results-header">
+    <h2>Search Results</h2>
+</div>
+
+<div class="table-container">
+    @if (results != null && results.length > 0) {
+      <table class="results">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>CITY</th>
+            <th>UNITS</th>
+            <th>FUNCTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of results; track $index) {
+            <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.city }}</td>
+                <td>{{ r.units }}</td>
+                <div class="btns">
+                    <td class="btn-view">
+                        <button type="button" (click)="viewDetails(r.city + '+' + r.units)">View</button>
+                        <button type="button" id="btn-remove" (click)="remove(r.id)">X</button>
+                    </td>
+                </div>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else { 
+      <h3>No Results Available</h3>
+    }
+</div>
+
+<div class="btns">
+    <button type="button" id="save-btn" (click)="saveDB()">Save</button>
+    <button type="button" [routerLink]="['/']">Back</button>
+</div>

@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,8 +171,22 @@ public class WeatherService {
             throw e; // throw exception if data does not exist in redis
 
         }
-        
 
     }
-    
+
+    // check redis db size
+    public int checkDb() {
+        return weatherRepo.checkNum();
+    }
+
+    // get all data from redis
+    public List<JsonObject> retrieveRedis() {
+        return weatherRepo.retrieveRedis();
+    }
+
+    // clear redis
+    public void clearRedis() {
+        weatherRepo.clearRedis();
+    }
+
 }

@@ -128,7 +128,6 @@ button:active {
 
 #clear-btn {
     display: flex;
-    height: 45px;
     text-align: center;
     justify-content: center;
     align-items: center;
@@ -180,6 +179,12 @@ td.btn-column {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.footer {
+    display: flex;
+    justify-content: center;
+    text-align: center;
 }
 
 @media (max-width: 768px) {

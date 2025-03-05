@@ -3,8 +3,10 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { ApiService } from '../services/api.service';
 import { SearchResult } from '../models/models';
 import { NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs';
+import { filter, Subscription } from 'rxjs';
 import { Title } from '@angular/platform-browser';
+import { DexieService } from '../services/dexie.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-search',
@@ -12,7 +14,11 @@ import { Title } from '@angular/platform-browser';
   templateUrl: './search.component.html',
   styleUrl: './search.component.css'
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, OnDestroy {
+
+  private http = inject(HttpClient)
+
+  private dexieSvc = inject(DexieService)
 
   private fb = inject(FormBuilder)
   protected form!: FormGroup
@@ -27,6 +33,8 @@ export class SearchComponent implements OnInit {
   protected results: SearchResult[] = []
   protected result!: SearchResult
 
+  lastId: string = ''
+
   // to hold search terms
   searchTerms = {
     city: '',
@@ -34,6 +42,11 @@ export class SearchComponent implements OnInit {
   }
 
   private title = inject(Title)
+
+  protected redislen: number = 0
+  private redisSizeSub!: Subscription
+  private redisDataSub!: Subscription
+  private clearRedisSub!: Subscription
 
   ngOnInit(): void {
 
@@ -53,8 +66,26 @@ export class SearchComponent implements OnInit {
       units: this.fb.control<string>('Standard') // defaults to standard
     })
 
-    // retrieve session data
-    this.retrieveData()
+    this.redisSizeSub = this.apiSvc.checkRedisSize().subscribe({
+      next: (data) => { 
+        this.redislen = data
+        console.log('>>> REDIS LEN: ', this.redislen)
+        // if redis length does not match curr local storage length
+        if (localStorage.length > 0 && localStorage.length != this.redislen) {
+          console.info('>>> VIEW DATA IS NOT UPDATED. RETRIEVING DATA FROM REDIS... ')
+          this.retrieveRedis()
+        } else {
+          this.retrieveData()
+        }
+      },
+      error: (err) => { 
+        console.error(err)
+        // re-init everything if error occurred
+        this.results = []
+        this.searchTerms.city = ''
+        this.searchTerms.units = ''
+      }
+    })
 
   }
 
@@ -66,7 +97,7 @@ export class SearchComponent implements OnInit {
 
       if (storedDataString) { // null check bc it cannot be parsed if it is null
         this.results = JSON.parse(storedDataString)
-        console.info('>>> PARSED STORED DATA: ', this.results)
+        console.info('>>> LOCAL STORED DATA: ', this.results)
       }
 
       // if there is stored session search, retrieve
@@ -74,7 +105,7 @@ export class SearchComponent implements OnInit {
 
         if (storedTermsString) {
           this.searchTerms = JSON.parse(storedTermsString)
-          console.info('>>> PARSED STORED TERMS: ', this.searchTerms)
+          console.info('>>> LOCAL STORED TERMS: ', this.searchTerms)
         }
 
     } else {
@@ -103,7 +134,7 @@ export class SearchComponent implements OnInit {
         this.saveSessionData()
       })
       .catch(err => {
-        console.error('>>> ERROR FETCHING WEATHER DATA: ', err)
+        throw err
       })
 
   }
@@ -131,7 +162,7 @@ export class SearchComponent implements OnInit {
         )) {
           // append new result to prev data
           storedData.push(this.result) 
-          console.info('>>> PUSHED TO STORED DATA: ', this.result)
+          console.info('>>> PUSHED TO LOCAL STORAGE: ', this.result)
           localStorage.setItem("currData", JSON.stringify(storedData))
         }
 
@@ -144,16 +175,77 @@ export class SearchComponent implements OnInit {
 
   // for viewing details of each search entry
   viewDetails(cityUnits: string) {
-    console.info('>>> SAVING DETAILS FOR VIEW')
-    this.router.navigate([ '/city', cityUnits ])
+    if (cityUnits != undefined) {
+      this.router.navigate([ '/city', cityUnits ])
+    } else {
+      window.location.reload()
+    }
   }  
 
   // clear storage on destroy
   destroy(): void {
     localStorage.clear()
+    this.dexieSvc.clearDexie()
+    this.apiSvc.clearRedis()
+    console.log('>>> ALL TEMPORARY DATA CLEARED')
+    console.log(">>> DEXIE: ", this.dexieSvc.viewResults.length)
+    console.log(">>> LOCAL: ", localStorage.length)
+    console.log(">>> REDIS: TRUST ME BRO ")
+  }
 
-    // refresh page to update view
-    window.location.reload()
+  // save results to dexie and navigate to dexie page
+  async review() {
+
+    // get last id from results array
+    if (localStorage && localStorage.length > 0) {
+      let storedDataString = localStorage.getItem("currData")
+
+      if (storedDataString) { // null check bc it cannot be parsed if it is null
+        this.results = JSON.parse(storedDataString)
+      }
+
+      this.lastId = this.results.at(this.results.length - 1)!.id
+    } else {
+      window.location.reload()
+      return
+    }
+
+    // if last id exists in results array
+    // skip add results method and navigate
+    if (await this.dexieSvc.exists(this.lastId)) {
+      console.log('>>> ID ALREADY EXISTS IN DEXIE: ', this.lastId)
+    } else {
+      this.dexieSvc.addResults(this.results)
+        .then(result => {
+          const dexId = result
+          console.log('>>> LAST ID GENERATED ON DEXIE: ', dexId)
+        })
+        .catch(err => {
+          throw err
+        })
+    }
+
+    this.router.navigate([ '/review' ])
+  }
+
+  // retrieve all data from redis
+  retrieveRedis() {
+    this.redisDataSub = this.apiSvc.retrieveRedis().subscribe({
+      next: (resp) => {
+        this.results = resp
+      },
+      error: (err) => {
+        throw err
+      }
+    })
+  }
+
+  // view saved results in mongodb (navigate to store page)
+  viewDB() {
+    this.router.navigate(['/store'])
+  }
+
+  ngOnDestroy(): void {
   }
 
 }

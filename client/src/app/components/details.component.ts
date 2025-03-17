@@ -25,9 +25,9 @@ export class DetailsComponent implements OnInit {
   protected cityUnits: string = ''
   protected details!: SearchResult
 
-  // on init, get details via id and display
+  // on init, get details from redis via id and display
   ngOnInit(): void {
-    this.title.setTitle('Weather Details')
+    this.title.setTitle('Weather Details') // setting title for webpage
     this.cityUnits = this.route.snapshot.paramMap.get('cityUnits')! // get cityUnits from param
     console.info('>>> RETRIEVING DATA FOR: ', this.cityUnits)
     this.apiSvc.retrieveData(this.cityUnits)
